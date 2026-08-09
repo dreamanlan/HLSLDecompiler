@@ -3,14 +3,22 @@
 
 #include "hlslcc.h"
 
+ResourceGroup ResourceTypeToResourceGroup(ResourceType);
 
-int GetResourceFromBindingPoint(ResourceType eType, uint32_t ui32BindPoint, ShaderInfo* psShaderInfo, ResourceBinding** ppsOutBinding);
+int GetResourceFromBindingPoint(const ResourceGroup eGroup, const uint32_t ui32BindPoint, const ShaderInfo* psShaderInfo, ResourceBinding** ppsOutBinding);
 
-void GetConstantBufferFromBindingPoint(const uint32_t ui32BindPoint, const ShaderInfo* psShaderInfo, ConstantBuffer** ppsConstBuf);
-
-void GetUAVBufferFromBindingPoint(const uint32_t ui32BindPoint, ShaderInfo* psShaderInfo, ConstantBuffer** ppsConstBuf);
+void GetConstantBufferFromBindingPoint(const ResourceGroup eGroup, const uint32_t ui32BindPoint, const ShaderInfo* psShaderInfo, ConstantBuffer** ppsConstBuf);
 
 int GetInterfaceVarFromOffset(uint32_t ui32Offset, ShaderInfo* psShaderInfo, ShaderVar** ppsShaderVar);
+
+uint32_t ShaderVarSize(ShaderVarType* psType, uint32_t* singularSize);
+
+int GetShaderVarFromOffset(const uint32_t ui32Vec4Offset,
+						   const uint32_t* pui32Swizzle,
+						   ConstantBuffer* psCBuf,
+						   ShaderVarType** ppsShaderVar,
+						   int32_t* pi32Index,
+						   int32_t* pi32Rebase);
 
 typedef struct
 {
@@ -20,6 +28,8 @@ typedef struct
     uint32_t* pui32Interfaces;
     uint32_t* pui32Inputs11;
     uint32_t* pui32Outputs11;
+	uint32_t* pui32OutputsWithStreams;
+	uint32_t* pui32PatchConstants;
 } ReflectionChunks;
 
 void LoadShaderInfo(const uint32_t ui32MajorVersion,

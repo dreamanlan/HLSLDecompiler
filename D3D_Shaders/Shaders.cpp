@@ -13,7 +13,7 @@ using namespace std;
 FILE *LogFile = NULL;
 bool gLogDebug = false;
 
-vector<string> enumerateFiles(string pathName, string filter = "") {
+static vector<string> enumerateFiles(string pathName, string filter = "") {
 	vector<string> files;
 	WIN32_FIND_DATAA FindFileData;
 	HANDLE hFind;
@@ -32,6 +32,21 @@ vector<string> enumerateFiles(string pathName, string filter = "") {
 		FindClose(hFind);
 	}
 	return files;
+}
+
+static vector<byte> readFile(string fileName) {
+	vector<byte> buffer;
+	FILE* f;
+	fopen_s(&f, fileName.c_str(), "rb");
+	if (f != NULL) {
+		fseek(f, 0L, SEEK_END);
+		int fileSize = ftell(f);
+		buffer.resize(fileSize);
+		fseek(f, 0L, SEEK_SET);
+		size_t numRead = fread(buffer.data(), 1, buffer.size(), f);
+		fclose(f);
+	}
+	return buffer;
 }
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -107,7 +122,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				fileName.append("bin");
 				auto BIN = readFile(fileName);
 				
-				auto CBO = assembler(ASM, BIN);
+				auto CBO = assembler((vector<char>*)&ASM, BIN);
 
 				fileName.erase(fileName.size() - 3, 3);
 				fileName.append("cbo");

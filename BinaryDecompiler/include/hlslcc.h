@@ -17,7 +17,7 @@
     #define HLSLCC_API
 #endif
 
-#include "pstdint.h"
+#include <stdint.h>
 
 typedef enum
 {
@@ -50,6 +50,7 @@ enum {MAX_FUNCTION_POINTERS = 128};
 #define MAX_CBUFFERS 256
 #define MAX_UAV 256
 #define MAX_FUNCTION_TABLES 256
+#define MAX_RESOURCE_BINDINGS 256
 
 typedef enum SPECIAL_NAME
 {
@@ -88,14 +89,14 @@ typedef enum {
 } INOUT_COMPONENT_TYPE;
 
 typedef enum MIN_PRECISION { 
-  D3D_MIN_PRECISION_DEFAULT    = 0,
-  D3D_MIN_PRECISION_FLOAT_16   = 1,
-  D3D_MIN_PRECISION_FLOAT_2_8  = 2,
-  D3D_MIN_PRECISION_RESERVED   = 3,
-  D3D_MIN_PRECISION_SINT_16    = 4,
-  D3D_MIN_PRECISION_UINT_16    = 5,
-  D3D_MIN_PRECISION_ANY_16     = 0xf0,
-  D3D_MIN_PRECISION_ANY_10     = 0xf1
+  MIN_PRECISION_DEFAULT    = 0,
+  MIN_PRECISION_FLOAT_16   = 1,
+  MIN_PRECISION_FLOAT_2_8  = 2,
+  MIN_PRECISION_RESERVED   = 3,
+  MIN_PRECISION_SINT_16    = 4,
+  MIN_PRECISION_UINT_16    = 5,
+  MIN_PRECISION_ANY_16     = 0xf0,
+  MIN_PRECISION_ANY_10     = 0xf1
 } MIN_PRECISION;
 
 struct InOutSignature
@@ -127,6 +128,14 @@ typedef enum ResourceType_TAG
     RTYPE_UAV_CONSUME_STRUCTURED,//10
     RTYPE_UAV_RWSTRUCTURED_WITH_COUNTER,//11
 } ResourceType;
+
+typedef enum ResourceGroup_TAG {
+	RGROUP_CBUFFER,
+	RGROUP_TEXTURE,
+	RGROUP_SAMPLER,
+	RGROUP_UAV,
+	RGROUP_COUNT,
+} ResourceGroup;
 
 typedef enum REFLECT_RESOURCE_DIMENSION
 {
@@ -235,6 +244,15 @@ struct ShaderVarType {
   std::string                   FullName;
 
   ShaderVarType *Members;
+
+  ShaderVarType() :
+	  Members(NULL)
+  {}
+
+  ~ShaderVarType()
+  {
+	  delete [] Members;
+  }
 };
 
 struct ShaderVar
@@ -256,6 +274,8 @@ struct ConstantBuffer
     std::vector<ShaderVar> asVars;
 
     uint32_t ui32TotalSizeInBytes;
+
+	int iUnsized;
 };
 
 struct ClassType
@@ -306,6 +326,9 @@ struct ShaderInfo
     uint32_t ui32NumOutputSignatures;
     InOutSignature* psOutputSignatures;
 
+	uint32_t ui32NumPatchConstantSignatures;
+    InOutSignature* psPatchConstantSignatures;
+
     uint32_t ui32NumResourceBindings;
     ResourceBinding* psResourceBindings;
 
@@ -322,8 +345,7 @@ struct ShaderInfo
     //Func table ID to class name ID.
     std::map<int, uint32_t> aui32TableIDToTypeID;
 
-    std::map<int, uint32_t> aui32ConstBufferBindpointRemap;
-    std::map<int, uint32_t> aui32UAVBindpointRemap;
+    std::map<int, uint32_t> aui32ResourceMap[RGROUP_COUNT];
 
     TESSELLATOR_PARTITIONING eTessPartitioning;
     TESSELLATOR_OUTPUT_PRIMITIVE eTessOutPrim;
@@ -335,6 +357,8 @@ struct ShaderInfo
 		ui32NumInputSignatures(0),
 		psOutputSignatures(0), 
 		ui32NumOutputSignatures(0),
+		psPatchConstantSignatures(0),
+		ui32NumPatchConstantSignatures(0),
 		psResourceBindings(0),
 		ui32NumResourceBindings(0),
 		ui32NumConstantBuffers(0),
@@ -345,8 +369,7 @@ struct ShaderInfo
 		psClassInstances(0),
 		ui32NumClassInstances(0),
 		aui32TableIDToTypeID(),
-		aui32ConstBufferBindpointRemap(),
-		aui32UAVBindpointRemap()
+		aui32ResourceMap()
 	{
 	}
 };

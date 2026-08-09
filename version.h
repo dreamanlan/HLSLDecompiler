@@ -1,5 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
+// Used by DirectX9.rc
 // Used by DirectX11.rc
 // Used by NVAPI.rc
 
@@ -17,6 +18,8 @@
 // Used for embedded font resource for overlay
 #define SPRITEFONT					256
 #define IDR_COURIERBOLD				101
+#define IDR_COURIERSMALL			102
+#define IDR_ARIAL				103
 
 
 // Actual version, name, copyright information that is built into the dlls.
@@ -25,8 +28,8 @@
 // The VERSION_REVISION is automatically incremented for every Publish build.
 
 #define VERSION_MAJOR               1
-#define VERSION_MINOR               2
-#define VERSION_REVISION            45
+#define VERSION_MINOR               3
+#define VERSION_REVISION            16
  
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
@@ -39,7 +42,7 @@
 #define VER_PRODUCTNAME_STR         "3Dmigoto"
 #define VER_PRODUCT_VERSION         VER_FILE_VERSION
 #define VER_PRODUCT_VERSION_STR     VER_FILE_VERSION_STR
-#define VER_COPYRIGHT_STR           "Copyright (C) 2014-2015"
+#define VER_COPYRIGHT_STR           "Copyright (C) 2014-2019"
  
 #ifdef _DEBUG
   #define VER_VER_DEBUG             VS_FF_DEBUG
